@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import './App.css';
 
 import firebase from 'firebase/app';
@@ -7,6 +7,11 @@ import 'firebase/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const firestore = firebase.firestore();
 
 const firebaseConfig = {
   apiKey: "AIzaSyBAkPf8rbPKkaoiYSvV4tLlOm_rbH9pG3U",
@@ -18,9 +23,6 @@ const firebaseConfig = {
   measurementId: "G-1E3K1N8X75"
 };
 
-const auth = firebase.auth();
-const firestore = firebase.firestore();
-
 function App() {
   const [user] = useAuthState(auth);
 
@@ -29,7 +31,7 @@ function App() {
       <header>
       </header>
       <section>
-        {user ? <Chatroom /> : <SignIn />}
+        {user ? <ChatRoom /> : <SignIn />}
       </section>
     </div>
   );
@@ -64,7 +66,7 @@ function ChatRoom() {
 
     const {uid, photoURL} = auth.currentUser;
 
-    await messagesRed.add({
+    await messagesRef.add({
       text: formValue,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
       uid,
@@ -97,11 +99,11 @@ function ChatMessage(props) {
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
 
   return (
-    <div className={'message ${messageClass}'}>
-      <img src={photoURL}/>
+    <div className={`message ${messageClass}`}>
+      <img src={photoURL} alt="User" />
       <p>{text}</p>
     </div>
-  )
+  );
 }
 
 export default App;
